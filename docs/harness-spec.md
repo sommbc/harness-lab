@@ -26,6 +26,8 @@ stages:
 
 Stable machine-readable harness id.
 
+The value must match the harness directory name and use lowercase letters, numbers, and hyphens.
+
 ### name
 
 Human-readable harness name.
@@ -61,8 +63,30 @@ Each stage should define:
 - outputs
 - approval
 
+Stage IDs must be unique within the harness and use lowercase letters, numbers, and hyphens.
+
 ## Approval values
 
 - none
 - recommended
 - required
+
+## Validation
+
+Run:
+
+```bash
+npm run validate:harnesses
+```
+
+Validation checks:
+
+- required top-level fields
+- harness ID format
+- harness ID matches the directory name
+- maturity value
+- non-empty stage list
+- stage ID format
+- duplicate stage IDs
+- approval value
+- string-list fields such as `inputs` and `outputs`

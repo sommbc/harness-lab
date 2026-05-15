@@ -6,8 +6,8 @@ Harness Lab is intentionally small. Contributions should keep the project inspec
 
 ```bash
 npm install
-npm run build
-npm test
+npm run check
+npm audit --audit-level=moderate
 ```
 
 ## Guidelines
@@ -24,8 +24,8 @@ npm test
 Before opening a pull request, run:
 
 ```bash
-npm run build
-npm test
+npm run check
+npm audit --audit-level=moderate
 ```
 
 Include a short summary, the checks you ran, and any remaining risk.

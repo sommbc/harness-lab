@@ -20,7 +20,7 @@ export async function createRun(harness: HarnessDefinition, options: CreateRunOp
     await fs.mkdir(runPath);
   } catch (error) {
     if (isNodeError(error) && error.code === 'EEXIST') {
-      throw new Error(`Run already exists: ${runPath}`);
+      throw new Error(`Run already exists: ${runPath}`, { cause: error });
     }
 
     throw error;

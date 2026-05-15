@@ -38,6 +38,32 @@ test('rejects unsafe harness ids', async () => {
   await assert.rejects(() => loadHarness('../private'), /Invalid harness id/);
 });
 
+test('rejects a harness definition whose id does not match its directory', async (t) => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'harness-lab-'));
+  t.after(() => rm(root, { recursive: true, force: true }));
+
+  const harnessDir = path.join(root, 'harnesses');
+  await mkdir(path.join(harnessDir, 'demo'), { recursive: true });
+  await writeFile(path.join(harnessDir, 'demo', 'harness.yaml'), demoHarnessYaml().replace('id: demo', 'id: other'), 'utf8');
+
+  await assert.rejects(() => loadHarness('demo', { harnessDir }), /id must match directory name/);
+});
+
+test('rejects duplicate stage ids', async (t) => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'harness-lab-'));
+  t.after(() => rm(root, { recursive: true, force: true }));
+
+  const harnessDir = path.join(root, 'harnesses');
+  await mkdir(path.join(harnessDir, 'demo'), { recursive: true });
+  await writeFile(
+    path.join(harnessDir, 'demo', 'harness.yaml'),
+    demoHarnessYaml().replace('id: review', 'id: intake'),
+    'utf8',
+  );
+
+  await assert.rejects(() => loadHarness('demo', { harnessDir }), /duplicate stage id/);
+});
+
 function demoHarnessYaml(): string {
   return `id: demo
 name: Demo Harness

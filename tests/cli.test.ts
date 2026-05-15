@@ -24,6 +24,9 @@ test('CLI lists harnesses and creates a named run', async (t) => {
   assert.match(listResult.stdout, /Available harnesses:/);
   assert.match(listResult.stdout, /- demo/);
 
+  const validateResult = await runCli(['--harness-dir', harnessDir, 'validate']);
+  assert.match(validateResult.stdout, /Validated 1 harness\./);
+
   const newResult = await runCli(['--harness-dir', harnessDir, 'new', 'demo', '--name', 'CLI Smoke', '--runs-dir', runsDir]);
   assert.match(newResult.stdout, /Created run:/);
   assert.match(newResult.stdout, /work through each stage manually/);

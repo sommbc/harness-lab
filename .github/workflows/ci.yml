@@ -2,11 +2,13 @@ name: CI
 
 on:
   push:
+    branches: [main]
   pull_request:
+    branches: [main]
 
 jobs:
-  build-test:
-    name: Build and test
+  quality:
+    name: Quality gate
     runs-on: ubuntu-latest
 
     steps:
@@ -22,8 +24,20 @@ jobs:
       - name: Install
         run: npm ci
 
-      - name: Build
-        run: npm run build
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Validate bundled harnesses
+        run: npm run validate:harnesses
 
       - name: Test
         run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Dependency audit
+        run: npm audit --audit-level=moderate

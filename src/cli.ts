@@ -42,6 +42,20 @@ program
   });
 
 program
+  .command('validate')
+  .description('Validate all harness definitions')
+  .action(async () => {
+    const harnessDir = await resolveHarnessDir();
+    const harnesses = await listHarnesses({ harnessDir });
+
+    for (const harnessId of harnesses) {
+      await loadHarness(harnessId, { harnessDir });
+    }
+
+    console.log(`Validated ${harnesses.length} harness${harnesses.length === 1 ? '' : 'es'}.`);
+  });
+
+program
   .command('new')
   .argument('<harness>', 'Harness id')
   .option('-n, --name <name>', 'Run name')

@@ -39,4 +39,4 @@ A minimum viable harness has:
 - No audit criteria
 - Too many agents
 - Hidden human work
-- The workflow depends on vibes
+- The workflow depends on unstated judgment

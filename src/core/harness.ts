@@ -39,7 +39,12 @@ export async function loadHarness(id: string, options: HarnessLookupOptions = {}
 
   const harnessPath = path.join(resolveHarnessDir(options), id, 'harness.yaml');
   const content = await fs.readFile(harnessPath, 'utf8');
-  return parseHarnessDefinition(yaml.load(content), harnessPath);
+  const harness = parseHarnessDefinition(yaml.load(content), harnessPath);
+  if (harness.id !== id) {
+    throw new Error(`Invalid harness definition in ${harnessPath}: id must match directory name "${id}"`);
+  }
+
+  return harness;
 }
 
 function resolveHarnessDir(options: HarnessLookupOptions): string {
@@ -49,6 +54,12 @@ function resolveHarnessDir(options: HarnessLookupOptions): string {
 function assertSafeHarnessId(id: string): void {
   if (!/^[a-z0-9][a-z0-9-]*$/u.test(id)) {
     throw new Error(`Invalid harness id: ${id}`);
+  }
+}
+
+function assertSafeStageId(id: string, source: string, index: number): void {
+  if (!/^[a-z0-9][a-z0-9-]*$/u.test(id)) {
+    throw new Error(`Invalid harness definition in ${source}: stage ${index} has invalid id "${id}"`);
   }
 }
 
@@ -75,6 +86,8 @@ function readStages(definition: Record<string, unknown>, source: string): Harnes
     throw new Error(`Invalid harness definition in ${source}: stages must be a non-empty array`);
   }
 
+  const seenStageIds = new Set<string>();
+
   return stages.map((stage, index) => {
     const record = asRecord(stage, `${source} stage ${index + 1}`);
     const approval = record.approval;
@@ -88,8 +101,16 @@ function readStages(definition: Record<string, unknown>, source: string): Harnes
       throw new Error(`Invalid harness definition in ${source}: stage ${index + 1} has invalid approval`);
     }
 
+    const id = readString(record, 'id', source);
+    assertSafeStageId(id, source, index + 1);
+
+    if (seenStageIds.has(id)) {
+      throw new Error(`Invalid harness definition in ${source}: duplicate stage id "${id}"`);
+    }
+    seenStageIds.add(id);
+
     return {
-      id: readString(record, 'id', source),
+      id,
       name: readString(record, 'name', source),
       agent: readOptionalString(record, 'agent', source),
       description: readOptionalString(record, 'description', source),
