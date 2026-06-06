@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
   quality:
     name: Quality gate
@@ -41,3 +44,16 @@ jobs:
 
       - name: Dependency audit
         run: npm audit --audit-level=moderate
+
+      - name: Package contents
+        run: npm pack --dry-run
+
+      - name: Secret smoke scan
+        run: |
+          if git grep -n -I -E '(sk-[A-Za-z0-9_-]{20,}|ghp_[A-Za-z0-9_]{30,}|github_pat_[A-Za-z0-9_]{20,}|BEGIN (RSA|OPENSSH|EC|DSA) PRIVATE KEY|AKIA[0-9A-Z]{16})' -- . ':!.github/workflows/ci.yml'; then
+            echo "Potential secret detected."
+            exit 1
+          fi
+
+      - name: Whitespace check
+        run: git diff --check

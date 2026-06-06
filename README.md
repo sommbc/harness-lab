@@ -194,6 +194,8 @@ The CLI is deliberately small:
 3. Create a run folder with one Markdown file per stage.
 4. Stop. The user or their AI tool fills in each stage manually.
 
+For a reviewer-focused summary of the public boundary, quality gate, and scope limits, see [Public Review Notes](docs/public-review.md).
+
 ## Security and Privacy
 
 Harness Lab v0.1 is local-only and does not send data over the network.
